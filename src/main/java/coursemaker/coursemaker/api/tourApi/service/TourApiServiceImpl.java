@@ -557,7 +557,7 @@ public class TourApiServiceImpl implements TourApiService {
                 log.info("[TourApi] 새로운 Destination 저장: contentId={}", tourApi.getContentid());
                 // Destination 테이블에 해당 항목이 없으면 새로 저장
                 RequestDto dto = new RequestDto();
-                LocationDto locationDto = new LocationDto(tourApi.getAddr1(), tourApi.getMapy(), tourApi.getMapx());
+                LocationDto locationDto = new LocationDto(tourApi.getAddr1(), tourApi.getMapx(), tourApi.getMapy());
                 Optional<Member> adminMember = memberRepository.findById(1L);
                 List<TagResponseDto> tags = tagService.findAllTags();
                 // 자연
