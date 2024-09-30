@@ -44,13 +44,19 @@ public class DestinationServiceImpl implements DestinationService {
 
     @Transactional
     @Override
-    public Destination save(@Valid RequestDto requestDto) {
+    public Destination save(@Valid RequestDto requestDto, boolean isApiData) {
         log.info("[Destination] 여행지 저장 시작 - 이름: {}, 저장한 사람: {}", requestDto.getName(), requestDto.getNickname());
         Member member = memberService.findByNickname(requestDto.getNickname());
 
         if (destinationRepository.existsByNameAndDeletedAtIsNull(requestDto.getName())) {
             log.error("[Destination] 여행지 중복 오류 - 이름: {}, 저장한 사람: {}", requestDto.getName(), requestDto.getNickname());
             throw new DestinationDuplicatedException("여행지 이름이 이미 존재합니다.", "Destination name: " + requestDto.getName());
+        }
+
+        if (isApiData) {
+            if (requestDto.getIsApiData() == null || !requestDto.getIsApiData()) {
+                throw new IllegalArgumentException("API에서 apiContent가 필요합니다.");
+            }
         }
 
         Destination destination = requestDto.toEntity(member);
@@ -67,7 +73,7 @@ public class DestinationServiceImpl implements DestinationService {
 
     @Transactional
     @Override
-    public Destination update(Long id, @Valid RequestDto requestDto) {
+    public Destination update(Long id, @Valid RequestDto requestDto, boolean isApiData) {
         log.info("[Destination] 여행지 업데이트 시작 - ID: {}, 업데이트한 사람: {}", id, requestDto.getNickname());
 
         Destination destination = destinationRepository.findByIdAndDeletedAtIsNull(id)
@@ -79,6 +85,12 @@ public class DestinationServiceImpl implements DestinationService {
         if (destinationRepository.existsByNameAndIdNotAndDeletedAtIsNull(requestDto.getName(), id)) {
             log.error("[Destination] 여행지 이름 중복 오류 - 이름: {}, 업데이트한 사람: {}", requestDto.getName(), requestDto.getNickname());
             throw new DestinationDuplicatedException("여행지 이름이 이미 존재합니다.", "Destination name: " + requestDto.getName());
+        }
+
+        if (isApiData) {
+            if (requestDto.getIsApiData() == null || !requestDto.getIsApiData()) {
+                throw new IllegalArgumentException("API에서 apiContent가 필요합니다.");
+            }
         }
 
         destination.setName(requestDto.getName());
