@@ -899,6 +899,9 @@ public class TourApiServiceImpl implements TourApiService {
 
                     dto.setName(tourApi.getTitle());
                     dto.setPictureLink(tourApi.getFirstimage());
+                    if (dto.getPictureLink() == null || dto.getPictureLink().isBlank() || dto.getPictureLink().isEmpty()) {
+                        dto.setPictureLink("https://i.ibb.co/XsNmR3Q/url-null.jpg");
+                    }
 //                dto.setContent(tourApi.getOverview());
                     dto.setApiContent(tourApi.getOverview());
                     dto.setLocation(locationDto);
