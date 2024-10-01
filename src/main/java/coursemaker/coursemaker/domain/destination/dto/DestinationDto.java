@@ -96,7 +96,12 @@ public class DestinationDto {
         dto.setLocation(location);
         dto.setAverageRating(averageRating);
         dto.setIsMyDestination(isMyDestination);
-        dto.setIsApiData(isApiData);
+        if(isApiData==null){
+            dto.setIsApiData(false);
+        }else{
+            dto.setIsApiData(isApiData);
+        }
+//        dto.setIsApiData(isApiData);
         dto.setReviewCount(reviewCount);
         dto.setWishCount(wishCount);
         dto.setLikeCount(likeCount);
