@@ -1,22 +1,19 @@
 package coursemaker.coursemaker.domain.destination.service;
 
-import coursemaker.coursemaker.domain.destination.dto.DestinationDto;
 import coursemaker.coursemaker.domain.destination.dto.LocationDto;
 import coursemaker.coursemaker.domain.destination.dto.RequestDto;
 import coursemaker.coursemaker.domain.destination.entity.Destination;
-import coursemaker.coursemaker.domain.wish.entity.DestinationWish;
 import coursemaker.coursemaker.util.CourseMakerPagination;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface DestinationService {
     // 여행지를 저장하는 메서드
-    Destination save(RequestDto requestDto, boolean isApiData);
+    Destination save(RequestDto requestDto);
 
     // 여행지를 업데이트하는 메서드
-    Destination update(Long id, RequestDto requestDto, boolean isApiData);
+    Destination update(Long id, RequestDto requestDto);
 
     // id 기반으로 특정 여행지를 조회하는 메서드
     Destination findById(Long id);

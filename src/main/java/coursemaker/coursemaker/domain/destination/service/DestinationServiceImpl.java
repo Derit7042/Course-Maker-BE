@@ -44,7 +44,7 @@ public class DestinationServiceImpl implements DestinationService {
 
     @Transactional
     @Override
-    public Destination save(@Valid RequestDto requestDto, boolean isApiData) {
+    public Destination save(@Valid RequestDto requestDto) {
         log.info("[Destination] 여행지 저장 시작 - 이름: {}, 저장한 사람: {}", requestDto.getName(), requestDto.getNickname());
         Member member = memberService.findByNickname(requestDto.getNickname());
 
@@ -53,8 +53,8 @@ public class DestinationServiceImpl implements DestinationService {
             throw new DestinationDuplicatedException("여행지 이름이 이미 존재합니다.", "Destination name: " + requestDto.getName());
         }
 
-        if (isApiData) {
-            if (requestDto.getIsApiData() == null || !requestDto.getIsApiData()) {
+        if (requestDto.getIsApiData()!=null && requestDto.getIsApiData()) {
+            if (requestDto.getApiContent() == null || !requestDto.getApiContent().isBlank()) {
                 throw new IllegalArgumentException("API에서 apiContent가 필요합니다.");
             }
         }
@@ -73,7 +73,7 @@ public class DestinationServiceImpl implements DestinationService {
 
     @Transactional
     @Override
-    public Destination update(Long id, @Valid RequestDto requestDto, boolean isApiData) {
+    public Destination update(Long id, @Valid RequestDto requestDto) {
         log.info("[Destination] 여행지 업데이트 시작 - ID: {}, 업데이트한 사람: {}", id, requestDto.getNickname());
 
         Destination destination = destinationRepository.findByIdAndDeletedAtIsNull(id)
@@ -87,8 +87,8 @@ public class DestinationServiceImpl implements DestinationService {
             throw new DestinationDuplicatedException("여행지 이름이 이미 존재합니다.", "Destination name: " + requestDto.getName());
         }
 
-        if (isApiData) {
-            if (requestDto.getIsApiData() == null || !requestDto.getIsApiData()) {
+        if (requestDto.getIsApiData()!=null && requestDto.getIsApiData()) {
+            if (requestDto.getApiContent() == null || requestDto.getApiContent().isBlank()) {
                 throw new IllegalArgumentException("API에서 apiContent가 필요합니다.");
             }
         }
