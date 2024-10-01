@@ -206,6 +206,7 @@ public class TagServiceImpl implements TagService{
         }
 
         OrderSpecifier<?> orderBySpecifier = null;
+        OrderSpecifier<?> subOrder = new OrderSpecifier<>(Order.DESC, travelCourse.createdAt);
 
         switch(orderBy) {
             case VIEWS:
@@ -233,6 +234,7 @@ public class TagServiceImpl implements TagService{
                 .groupBy(courseTag.course)// 코스로 묶어서
 //                .having(courseTag.course.count().gt(tagIds.size()-1))// 중복된 부분만 추출함
                 .orderBy(orderBySpecifier)// 정렬 조건 설정
+                .orderBy(subOrder)
                 .offset(pageable.getOffset())// 페이지네이션
                 .limit(pageable.getPageSize())
                 .fetch()
@@ -350,6 +352,7 @@ public class TagServiceImpl implements TagService{
         }
 
         OrderSpecifier<?> orderBySpecifier = null;
+        OrderSpecifier<?> subOrder = new OrderSpecifier<>(Order.DESC, destination.createdAt);
 
 
         switch(orderBy) {
@@ -379,6 +382,7 @@ public class TagServiceImpl implements TagService{
                 .groupBy(destinationTag.destination)// 여행지로 묶어서
 //                .having(destinationTag.destination.count().gt(tagIds.size()-1))// 중복된 부분만 추출
                 .orderBy(orderBySpecifier)// 정렬 조건 설정
+                .orderBy(subOrder)
                 .offset(pageable.getOffset())// 페이지네이션
                 .limit(pageable.getPageSize())
                 .fetch()// 쿼리 실행
