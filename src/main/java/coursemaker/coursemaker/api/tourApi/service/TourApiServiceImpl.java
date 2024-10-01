@@ -730,6 +730,186 @@ public class TourApiServiceImpl implements TourApiService {
                 dto.setNickname(adminMember.get().getNickname());
 
                 destinationService.save(dto);
+            } else if (existingDestination.isPresent()) {
+                Destination existing = existingDestination.get();
+                if (!existing.equals(tourApi)) {
+                    log.info("[TourApi] 존재하는 Destination 변경사항 있으면 업데이트: contentId={}", tourApi.getContentid());
+                    Long destinationId = existing.getId();
+                    RequestDto dto = new RequestDto();
+                    LocationDto locationDto = new LocationDto(tourApi.getAddr1(), tourApi.getMapx(), tourApi.getMapy());
+                    Optional<Member> adminMember = memberRepository.findById(1L);
+                    List<TagResponseDto> tags = tagService.findAllTags();
+                    // 자연
+                    TagResponseDto mountainTag = tags.stream().filter(tag -> "산".equals(tag.getName())).findFirst()
+                            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "산 태그"));
+                    TagResponseDto seaTag = tags.stream().filter(tag -> "바다".equals(tag.getName())).findFirst()
+                            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "바다 태그"));
+                    TagResponseDto natureViewTag = tags.stream().filter(tag -> "자연경관".equals(tag.getName())).findFirst()
+                            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "자연경관 태그"));
+                    TagResponseDto nationalParkTag = tags.stream().filter(tag -> "국/공립공원".equals(tag.getName())).findFirst()
+                            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "국/공립공원 태그"));
+                    TagResponseDto trailTag = tags.stream().filter(tag -> "둘레길".equals(tag.getName())).findFirst()
+                            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "둘레길 태그"));
+
+                    // 동행
+                    TagResponseDto soloTravelTag = tags.stream().filter(tag -> "나홀로 여행".equals(tag.getName())).findFirst()
+                            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "나홀로 여행 태그"));
+                    TagResponseDto withKidsTag = tags.stream().filter(tag -> "유아동반".equals(tag.getName())).findFirst()
+                            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "유아동반 태그"));
+                    TagResponseDto accessibleTravelTag = tags.stream().filter(tag -> "무장애여행".equals(tag.getName())).findFirst()
+                            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "무장애여행 태그"));
+                    TagResponseDto childrenTravelTag = tags.stream().filter(tag -> "어린이여행".equals(tag.getName())).findFirst()
+                            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "어린이여행 태그"));
+                    TagResponseDto parentsTravelTag = tags.stream().filter(tag -> "부모님".equals(tag.getName())).findFirst()
+                            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "부모님 태그"));
+                    TagResponseDto coupleTravelTag = tags.stream().filter(tag -> "연인/배우자".equals(tag.getName())).findFirst()
+                            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "연인/배우자 태그"));
+                    TagResponseDto friendsTravelTag = tags.stream().filter(tag -> "친구".equals(tag.getName())).findFirst()
+                            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "친구 태그"));
+                    TagResponseDto withPetsTag = tags.stream().filter(tag -> "애견동반".equals(tag.getName())).findFirst()
+                            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "애견동반 태그"));
+
+
+                    // 활동
+                    TagResponseDto activityTag = tags.stream().filter(tag -> "액티비티".equals(tag.getName())).findFirst()
+                            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "액티비티 태그"));
+                    TagResponseDto cultureMuseumTag = tags.stream().filter(tag -> "문화/박물관".equals(tag.getName())).findFirst()
+                            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "문화/박물관 태그"));
+                    TagResponseDto festivalPerformanceTag = tags.stream().filter(tag -> "축제/공연".equals(tag.getName())).findFirst()
+                            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "축제/공연 태그"));
+                    TagResponseDto experienceTravelTag = tags.stream().filter(tag -> "체험여행".equals(tag.getName())).findFirst()
+                            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "체험여행 태그"));
+                    TagResponseDto traditionalMarketTag = tags.stream().filter(tag -> "전통시장".equals(tag.getName())).findFirst()
+                            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "전통시장 태그"));
+                    TagResponseDto historicalSiteTag = tags.stream().filter(tag -> "역사/유적지".equals(tag.getName())).findFirst()
+                            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "역사/유적지 태그"));
+                    TagResponseDto restFacilityTag = tags.stream().filter(tag -> "휴식시설".equals(tag.getName())).findFirst()
+                            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "휴식시설 태그"));
+                    TagResponseDto foodTravelTag = tags.stream().filter(tag -> "식도락".equals(tag.getName())).findFirst()
+                            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "식도락 태그"));
+
+                    // 날씨
+                    TagResponseDto operatingInRainTag = tags.stream().filter(tag -> "우천시 운영".equals(tag.getName())).findFirst()
+                            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "우천시 운영 태그"));
+                    TagResponseDto indoorSpaceTag = tags.stream().filter(tag -> "실내공간".equals(tag.getName())).findFirst()
+                            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "실내공간 태그"));
+                    TagResponseDto vacationSpotTag = tags.stream().filter(tag -> "피서지".equals(tag.getName())).findFirst()
+                            .orElseThrow(() -> new TagNotFoundException("해당 태그가 존재하지 않습니다.", "피서지 태그"));
+
+                    // 산 + (무장애)
+                    if (tourApi.getCat3().equals("A01010400")) {
+                        if (tourApi.getDisabled()) {
+                            dto.setTags(List.of(mountainTag, accessibleTravelTag));
+                        } else {
+                            dto.setTags(List.of(mountainTag));
+                        }
+                        // 바다 + (무장애)
+                    } else if (tourApi.getCat3().equals("A01011100") || tourApi.getCat3().equals("A01011200") || tourApi.getCat3().equals("A01011300") || tourApi.getCat3().equals("A01011400") || tourApi.getCat3().equals("A01011600")) {
+                        if (tourApi.getDisabled()) {
+                            dto.setTags(List.of(seaTag, accessibleTravelTag));
+                        } else {
+                            dto.setTags(List.of(seaTag));
+                        }
+                        // 자연경관 + (무장애)
+                    } else if (tourApi.getCat3().equals("A01010500") || tourApi.getCat3().equals("A01010600") || tourApi.getCat3().equals("A01010700") || tourApi.getCat3().equals("A01010800") || tourApi.getCat3().equals("A01010900") || tourApi.getCat3().equals("A01011000") || tourApi.getCat3().equals("A01011700") || tourApi.getCat3().equals("A01011800") || tourApi.getCat3().equals("A01011900") || tourApi.getCat3().equals("A01020100") || tourApi.getCat3().equals("A01020200")) {
+                        if (tourApi.getDisabled()) {
+                            dto.setTags(List.of(natureViewTag, accessibleTravelTag));
+                        } else {
+                            dto.setTags(List.of(natureViewTag));
+                        }
+                        // 국/공립공원 + (무장애)
+                    } else if (tourApi.getCat3().equals("A01010100") || tourApi.getCat3().equals("A01010200") || tourApi.getCat3().equals("A01010300")) {
+                        if (tourApi.getDisabled()) {
+                            dto.setTags(List.of(nationalParkTag, accessibleTravelTag));
+                        } else {
+                            dto.setTags(List.of(nationalParkTag));
+                        }
+                        // 나홀로 여행 + (무장애)
+                    } else if (tourApi.getCat3().equals("C01130001")) {
+                        if (tourApi.getDisabled()) {
+                            dto.setTags(List.of(soloTravelTag, accessibleTravelTag));
+                        } else {
+                            dto.setTags(List.of(soloTravelTag));
+                        }
+                        // 부모님 + (무장애)
+                    } else if (tourApi.getCat3().equals("C01140001")) {
+                        if (tourApi.getDisabled()) {
+                            dto.setTags(List.of(parentsTravelTag, accessibleTravelTag));
+                        } else {
+                            dto.setTags(List.of(parentsTravelTag));
+                        }
+                        // 액티비티 + (무장애)
+                    } else if (tourApi.getCat2().equals("A0301") || tourApi.getCat2().equals("A0302") || tourApi.getCat2().equals("A0303") || tourApi.getCat2().equals("A0304") || tourApi.getCat2().equals("A0305") || tourApi.getCat3().equals("C01160001")) {
+                        if (tourApi.getDisabled()) {
+                            dto.setTags(List.of(activityTag, accessibleTravelTag));
+                        } else {
+                            dto.setTags(List.of(activityTag));
+                        }
+                        // 문화/박물관 + (무장애)
+                    } else if (tourApi.getCat3().equals("A02060100") || tourApi.getCat3().equals("A02060200") || tourApi.getCat3().equals("A02060300") || tourApi.getCat3().equals("A02060400") || tourApi.getCat3().equals("A02060500") || tourApi.getCat3().equals("A02060600") || tourApi.getCat3().equals("A02060700") || tourApi.getCat3().equals("A02060800") || tourApi.getCat3().equals("A02061100")) {
+                        if (tourApi.getDisabled()) {
+                            dto.setTags(List.of(cultureMuseumTag, accessibleTravelTag));
+                        } else {
+                            dto.setTags(List.of(cultureMuseumTag));
+                        }
+                        // 축제/공연 + (무장애)
+                    } else if (tourApi.getCat3().equals("A02070100") || tourApi.getCat3().equals("A02070200") || tourApi.getCat3().equals("A02080100") || tourApi.getCat3().equals("A02081200")) {
+                        if (tourApi.getDisabled()) {
+                            dto.setTags(List.of(festivalPerformanceTag, accessibleTravelTag));
+                        } else {
+                            dto.setTags(List.of(festivalPerformanceTag));
+                        }
+                        // 체험여행 + (무장애)
+                    } else if (tourApi.getCat3().equals("A02020800") || tourApi.getCat3().equals("A02030100") || tourApi.getCat3().equals("A02030200") || tourApi.getCat3().equals("A02030300") || tourApi.getCat3().equals("A02030400") || tourApi.getCat3().equals("A02030600")) {
+                        if (tourApi.getDisabled()) {
+                            dto.setTags(List.of(experienceTravelTag, accessibleTravelTag));
+                        } else {
+                            dto.setTags(List.of(experienceTravelTag));
+                        }
+                        // 전통시장 + (무장애)
+                    } else if (tourApi.getCat3().equals("A04010100") || tourApi.getCat3().equals("A04010900")) {
+                        if (tourApi.getDisabled()) {
+                            dto.setTags(List.of(traditionalMarketTag, accessibleTravelTag));
+                        } else {
+                            dto.setTags(List.of(traditionalMarketTag));
+                        }
+                        // 역사/유적지 + (무장애)
+                    } else if (tourApi.getCat2().equals("A0201") || tourApi.getCat3().equals("A02020200") || tourApi.getCat3().equals("A02050200")) {
+                        if (tourApi.getDisabled()) {
+                            dto.setTags(List.of(historicalSiteTag, accessibleTravelTag));
+                        } else {
+                            dto.setTags(List.of(historicalSiteTag));
+                        }
+                        // 휴식시설 + (무장애)
+                    } else if (tourApi.getCat3().equals("A02020300") || tourApi.getCat3().equals("A02020400") || tourApi.getCat3().equals("A02020500")) {
+                        if (tourApi.getDisabled()) {
+                            dto.setTags(List.of(restFacilityTag, accessibleTravelTag));
+                        } else {
+                            dto.setTags(List.of(restFacilityTag));
+                        }
+                        // 식도락 + (무장애)
+                    } else if (tourApi.getCat2().equals("A0502")) {
+                        if (tourApi.getDisabled()) {
+                            dto.setTags(List.of(foodTravelTag, accessibleTravelTag));
+                        } else {
+                            dto.setTags(List.of(foodTravelTag));
+                        }
+                    }
+
+
+                    dto.setName(tourApi.getTitle());
+                    dto.setPictureLink(tourApi.getFirstimage());
+//                dto.setContent(tourApi.getOverview());
+                    dto.setApiContent(tourApi.getOverview());
+                    dto.setLocation(locationDto);
+                    dto.setDisabled(tourApi.getDisabled());
+//                dto.setWithPet(tourApi.getWithPet());
+                    dto.setContentId(tourApi.getContentid());
+                    dto.setIsApiData(true);
+                    dto.setAverageRating(0d);
+                    dto.setNickname(adminMember.get().getNickname());
+                    destinationService.update(destinationId, dto);
+                }
             }
         }
     }
@@ -762,28 +942,30 @@ public class TourApiServiceImpl implements TourApiService {
     private synchronized void saveOrUpdateTour(TourApi tourApi) {
         Optional<TourApi> existingTour = tourApiRepository.findByContentid(tourApi.getContentid());
         if (existingTour.isPresent()) {
-            log.info("[TourApi] 기존 투어 업데이트: contentId={}", tourApi.getContentid());
-            TourApi existing = existingTour.get();
-            existing.setTitle(tourApi.getTitle());
-            existing.setTel(tourApi.getTel());
-            existing.setAddr1(tourApi.getAddr1());
-            existing.setAddr2(tourApi.getAddr2());
-            existing.setSigungucode(tourApi.getSigungucode());
-            existing.setFirstimage(tourApi.getFirstimage());
-            existing.setFirstimage2(tourApi.getFirstimage2());
-            existing.setMapx(tourApi.getMapx());
-            existing.setMapy(tourApi.getMapy());
-            existing.setZipcode(tourApi.getZipcode());
-            existing.setCreatedtime(tourApi.getCreatedtime());
-            existing.setModifiedtime(tourApi.getModifiedtime());
-            existing.setCat1(tourApi.getCat1());
-            existing.setCat2(tourApi.getCat2());
-            existing.setCat3(tourApi.getCat3());
-            existing.setContenttypeid(tourApi.getContenttypeid());
-            existing.setHomepage(tourApi.getHomepage());
-            existing.setOverview(tourApi.getOverview());
-            existing.setDisabled(tourApi.getDisabled());
-            tourApiRepository.save(existing);
+            if (!existingTour.equals(tourApi)) {
+                log.info("[TourApi] 기존 투어 업데이트: contentId={}", tourApi.getContentid());
+                TourApi existing = existingTour.get();
+                existing.setTitle(tourApi.getTitle());
+                existing.setTel(tourApi.getTel());
+                existing.setAddr1(tourApi.getAddr1());
+                existing.setAddr2(tourApi.getAddr2());
+                existing.setSigungucode(tourApi.getSigungucode());
+                existing.setFirstimage(tourApi.getFirstimage());
+                existing.setFirstimage2(tourApi.getFirstimage2());
+                existing.setMapx(tourApi.getMapx());
+                existing.setMapy(tourApi.getMapy());
+                existing.setZipcode(tourApi.getZipcode());
+                existing.setCreatedtime(tourApi.getCreatedtime());
+                existing.setModifiedtime(tourApi.getModifiedtime());
+                existing.setCat1(tourApi.getCat1());
+                existing.setCat2(tourApi.getCat2());
+                existing.setCat3(tourApi.getCat3());
+                existing.setContenttypeid(tourApi.getContenttypeid());
+                existing.setHomepage(tourApi.getHomepage());
+                existing.setOverview(tourApi.getOverview());
+                existing.setDisabled(tourApi.getDisabled());
+                tourApiRepository.save(existing);
+            }
         } else {
             log.info("[TourApi] 새로운 투어 저장: contentId={}", tourApi.getContentid());
             tourApiRepository.save(tourApi);
