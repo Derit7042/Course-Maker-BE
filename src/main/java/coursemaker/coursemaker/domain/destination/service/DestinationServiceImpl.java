@@ -53,11 +53,12 @@ public class DestinationServiceImpl implements DestinationService {
             throw new DestinationDuplicatedException("여행지 이름이 이미 존재합니다.", "Destination name: " + requestDto.getName());
         }
 
-        if (requestDto.getIsApiData()!=null && requestDto.getIsApiData()) {
-            if (requestDto.getApiContent() == null || !requestDto.getApiContent().isBlank()) {
-                throw new IllegalArgumentException("API에서 apiContent가 필요합니다.");
-            }
-        }
+        /*공공데이터에서 api content가 비어있는 경우가 있음.*/
+//        if (requestDto.getIsApiData()!=null && requestDto.getIsApiData()) {
+//            if (requestDto.getApiContent() == null || !requestDto.getApiContent().isBlank()) {
+//                throw new IllegalArgumentException("API에서 apiContent가 필요합니다.");
+//            }
+//        }
 
         Destination destination = requestDto.toEntity(member);
         destination.setAverageRating(requestDto.getAverageRating() != null ? requestDto.getAverageRating() : 0.0);
@@ -87,11 +88,12 @@ public class DestinationServiceImpl implements DestinationService {
             throw new DestinationDuplicatedException("여행지 이름이 이미 존재합니다.", "Destination name: " + requestDto.getName());
         }
 
-        if (requestDto.getIsApiData()!=null && requestDto.getIsApiData()) {
-            if (requestDto.getApiContent() == null || requestDto.getApiContent().isBlank()) {
-                throw new IllegalArgumentException("API에서 apiContent가 필요합니다.");
-            }
-        }
+        /*공공데이터에서 api content가 비어있는 경우가 있음.*/
+//        if (requestDto.getIsApiData()!=null && requestDto.getIsApiData()) {
+//            if (requestDto.getApiContent() == null || requestDto.getApiContent().isBlank()) {
+//                throw new IllegalArgumentException("API에서 apiContent가 필요합니다.");
+//            }
+//        }
 
         destination.setName(requestDto.getName());
         destination.setPictureLink(requestDto.getPictureLink());
