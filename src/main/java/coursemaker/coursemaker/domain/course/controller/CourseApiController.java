@@ -160,7 +160,7 @@ public class CourseApiController {
         Pageable pageable = PageRequest.of(page - 1, record);
         List<TravelCourseResponse> contents = new ArrayList<>();
         CourseMakerPagination<TravelCourse> travelCoursePage = tagService.findAllCourseByTagIds(tagIds, pageable, orderBy);
-        int totalPage = travelCoursePage.getTotalPage();
+        Long totalContents = travelCoursePage.getTotalContents();
         List<TravelCourse> travelCourses = travelCoursePage.getContents();
 
         for (TravelCourse travelCourse : travelCourses) {
@@ -182,8 +182,8 @@ public class CourseApiController {
             contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMyCourse, averageRating, reviewCount, wishCount, likeCount, isMyWishCourse, isMyLikeCourse));
         }
 
-        Page<TravelCourseResponse> responsePage = new PageImpl<>(contents, pageable, travelCoursePage.getTotalPage());
-        CourseMakerPagination<TravelCourseResponse> response = new CourseMakerPagination<>(pageable, responsePage, travelCoursePage.getTotalContents());
+        Page<TravelCourseResponse> responsePage = new PageImpl<>(contents, pageable, totalContents);
+        CourseMakerPagination<TravelCourseResponse> response = new CourseMakerPagination<>(pageable, responsePage, totalContents);
 
         return ResponseEntity.ok(response);
     }
@@ -330,7 +330,7 @@ public class CourseApiController {
             contents.add(new TravelCourseResponse(travelCourse, courseDestinationResponses, tags, isMyCourse, averageRating, reviewCount, wishCount, likeCount, isMyWishCourse, isMyLikeCourse));
         }
 
-        Page<TravelCourseResponse> responsePage = new PageImpl<>(contents, pageable, travelCoursePage.getTotalPage());
+        Page<TravelCourseResponse> responsePage = new PageImpl<>(contents, pageable, travelCoursePage.getTotalContents());
         CourseMakerPagination<TravelCourseResponse> response = new CourseMakerPagination<>(pageable, responsePage, travelCoursePage.getTotalContents());
 
         return ResponseEntity.ok(response);
