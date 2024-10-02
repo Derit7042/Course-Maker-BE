@@ -178,7 +178,7 @@ public class CourseServiceImpl implements CourseService{
             throw new CourseForbiddenException("사용자가 해당 코스에 접근할 권한이 없습니다.", "Course Forbidden");
         }
 
-        travelCourseRepository.findByIdAndDeletedAtIsNull(id)
+        TravelCourse travelCourse = travelCourseRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> {
                     log.error("[Course] 존재하지 않는 코스 수정 시도: ID={}", id);
                     return new TravelCourseNotFoundException("수정할 코스가 존재하지 않습니다.", "course ID: " + id);
@@ -189,33 +189,26 @@ public class CourseServiceImpl implements CourseService{
             throw new IllegalTravelCourseArgumentException("코스 제목은 50자를 넘길 수 없습니다.", "title's length is over 50");
         }
 
-        // TODO: ROW MAPPER로 엔티티 - DTO 매핑
-        /***************DTO - entity 변환**************/
-
         /*travel course 설정*/
-        /*TODO: 멤버 닉네임을 기반으로 객체 가져오는부분 연결하기!*/
         Member member = memberService.findByNickname(request.getNickname());
         log.debug("[Course] 멤버 찾기 결과: {}", member);
 
-        TravelCourse travelCourse = TravelCourse.builder()
-                .title(request.getTitle())
-                .content(request.getContent())
-                .duration(request.getDuration())
-                .travelerCount(request.getTravelerCount())
-                .travelType(request.getTravelType())
-                .pictureLink(request.getPictureLink())
-                .member(member)
-                .build();
-        travelCourse.setId(id);// id가 있으면 update함
-        travelCourse = travelCourseRepository.save(travelCourse);
-        log.info("[Course] 여행 코스 업데이트 완료: {}", travelCourse);
+        /**코스 객체 기본정보 업데이트*/
+        travelCourse.setTitle(request.getTitle());
+        travelCourse.setContent(request.getContent());
+        travelCourse.setDuration(request.getDuration());
+        travelCourse.setTravelerCount(request.getTravelerCount());
+        travelCourse.setTravelType(request.getTravelType());
+        travelCourse.setPictureLink(request.getPictureLink());
+        log.debug("[Course] 코스 객체 기본정보 업데이트 성공: {}", travelCourse);
 
 
-        /****TODO: ROW MAPPER로 엔티티 - DTO 매핑****/
-        /*destination 설정*/
+        /**course destination 업데이트*/
+        /*기존 여행지 초기화*/
         courseDestinationRepository.deleteAllByTravelCourseId(id);// 여행지 초기화
         log.debug("[Course] 기존 목적지 삭제 완료");
 
+        /*dto를 기반으로 여행지 재설정*/
         for (UpdateCourseDestinationRequest courseDestination : request.getCourseDestinations()) {
 
             CourseDestination courseDestinationEntity = CourseDestination.builder()
@@ -233,9 +226,13 @@ public class CourseServiceImpl implements CourseService{
         log.info("[Course] 목적지 업데이트 완료");
 
 
-        /*태그 설정*/
-        tagService.deleteAllTagByCourse(id);// 태그 초기화
+        /**태그 업데이트*/
+
+        /*기존 코스에 있는 태그 초기화*/
+        tagService.deleteAllTagByCourse(id);
         log.debug("[Course] 기존 태그 삭제 완료");
+
+        /*dto를 기반으로 태그 재설정*/
         List<Long> tagIds = request.getTags().stream()
                 .map(TagResponseDto::getId)
                 .collect(Collectors.toList());
