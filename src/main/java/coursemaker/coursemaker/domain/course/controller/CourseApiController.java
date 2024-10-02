@@ -64,7 +64,7 @@ public class CourseApiController {
     /*********스웨거 어노테이션**********/
     @Operation(summary = "코스 등록", description = "유저가 코스를 등록합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "코스 등록 성공, 헤더의 location에 생성된 데이터에 접근할 수 있는 주소를 반환합니다."),
+            @ApiResponse(responseCode = "201", description = "코스 등록 성공, 헤더의 location에 생성된 데이터에 접근할 수 있는 주소를 반환하고, 생성된 코스 정보는 body에 반환됩니다."),
             @ApiResponse(responseCode = "400", description = "생성하려는 여행지의 인자값이 올바르지 않을 때 반환합니다.", content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class),
@@ -104,8 +104,8 @@ public class CourseApiController {
             "'ROLE_ADMIN'" +
             ")"
     )
-    public ResponseEntity<Void> createTravelCourse(@RequestBody @Valid AddTravelCourseRequest request,
-                                                   @AuthenticationPrincipal LoginedInfo loginedInfo) {
+    public ResponseEntity<TravelCourseResponse> createTravelCourse(@RequestBody @Valid AddTravelCourseRequest request,
+                                                                   @AuthenticationPrincipal LoginedInfo loginedInfo) {
         /*로그인 한 사용자 닉네임*/
         // 로그인한 사용자 닉네임을 설정, 로그인이 되어 있지 않으면 null
         String nickname = loginedInfo != null ? loginedInfo.getNickname() : null;
@@ -117,8 +117,11 @@ public class CourseApiController {
         request.setNickname(nickname);
         TravelCourse savedTravelCourse = courseService.save(request);
 
+        /*생성한 코스 바디에 넣어서 반환*/
+        TravelCourseResponse newCourseResponse = findTravelCourseById(savedTravelCourse.getId(), loginedInfo).getBody();
+
         return (savedTravelCourse != null) ?
-                ResponseEntity.created(URI.create("/v1/courses/" + savedTravelCourse.getId())).build() :
+                ResponseEntity.created(URI.create("/v1/courses/" + savedTravelCourse.getId())).body(newCourseResponse):
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
